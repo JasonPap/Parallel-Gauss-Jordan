@@ -1,3 +1,5 @@
+#ifndef _COLUMN_BLOCK_H_
+#define _COLUMN_BLOCK_H_
 #include <unordered_map>
 
 class block
@@ -12,4 +14,4 @@ public:
 private:
     int column_size;
 };
-
+#endif // _COLUMN_BLOCK_H_
