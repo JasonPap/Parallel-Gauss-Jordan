@@ -2,6 +2,7 @@
 #include <time.h>
 #include <mpi.h>
 #include <iostream>
+#include <unistd.h>
 #include "InitFunctions.h"
 #include "ColumnBlock.h"
 #include "constants.h"
@@ -67,7 +68,7 @@ block* initialize(int dimention, int partition_mode)
         {
             for ( int i = 0; i < dimention; i++)
             {
-                MPI_Isend(tmpArrayA[i], dimention, MPI_INT, dimention%proc_num,
+                MPI_Isend(tmpArrayA[i], dimention, MPI_INT, i%proc_num,
                             i, MPI_COMM_WORLD, &(SendRequests[i]));
                 delete[] tmpArrayA[i];
             }
@@ -76,7 +77,7 @@ block* initialize(int dimention, int partition_mode)
         {
             for ( int i = 0; i < dimention; i++)
             {
-                MPI_Isend(tmpArrayA[i], dimention, MPI_INT, dimention/proc_num,
+                MPI_Isend(tmpArrayA[i], dimention, MPI_INT, i/proc_num,
                             i, MPI_COMM_WORLD, &(SendRequests[i]));
                 delete[] tmpArrayA[i];
             }
@@ -87,14 +88,29 @@ block* initialize(int dimention, int partition_mode)
 
     MPI_Request* ReceiveRequests = new MPI_Request[dimention/proc_num];
     // Every process receives it's columns
-    for ( int i = 0; i < dimention; i++)
+    for ( int i = 0, j = 0; i < dimention; i++)
     {
-        if ( dimention%proc_num == i )
+        if( partition_mode == distribution::ROUNDROBIN )
         {
-            int id;
-            int* data = new int[dimention];
-            MPI_Irecv((void*)data, dimention, MPI_INT, 0, i, MPI_COMM_WORLD, &(ReceiveRequests[i]));
-            proc_block->add_column(id, data);
+            if ( i%proc_num == proc_id )
+            {
+                int* data = new int[dimention];
+                MPI_Request request;
+                MPI_Irecv((void*)data, dimention, MPI_INT, 0, i, MPI_COMM_WORLD, &request);
+                ReceiveRequests[j++] = request;
+                proc_block->add_column(i, data);
+            }
+        }
+        else if( partition_mode == distribution::GROUPED )
+        {
+            if ( i/proc_num == proc_id )
+            {
+                int* data = new int[dimention];
+                MPI_Request request;
+                MPI_Irecv((void*)data, dimention, MPI_INT, 0, i, MPI_COMM_WORLD, &request);
+                ReceiveRequests[j++] = request;
+                proc_block->add_column(i, data);
+            }
         }
     }
 
@@ -114,6 +130,7 @@ block* initialize(int dimention, int partition_mode)
     {
         //wait on send
         MPI_Status* statuses = new MPI_Status[dimention];
+        cout <<"WAIT FOR SEND REQUESTS: "<<proc_id<<endl;
         int wait_retval = MPI_Waitall(dimention, SendRequests, statuses);
         if ( wait_retval != MPI_SUCCESS )
         {

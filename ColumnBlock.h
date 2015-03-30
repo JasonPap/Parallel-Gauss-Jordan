@@ -9,7 +9,7 @@ public:
     ~block();
     bool add_column(int id, int* data);
 
-    std::unordered_map<int, int*> column;
+    std::unordered_map<int, int*> column;   // key: column index, value: pointer to column
 
 private:
     int column_size;
