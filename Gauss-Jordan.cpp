@@ -9,3 +9,7 @@ int find_pivot(block* proc_block, int k)
     return proc_block->find_pivot(k);
 }
 
+int compute_values(block* proc_block, int k)
+{
+    return 1;
+}

@@ -1,6 +1,7 @@
 #include <unordered_map>
 #include <iostream>
 #include <cstdlib>
+#include <mpi.h>
 #include "ColumnBlock.h"
 
 using namespace std;
@@ -9,6 +10,9 @@ block::block(int column_size)
 {
     this->column_size = column_size;
     pivot_array = new int[column_size];
+
+    rank_id = MPI::COMM_WORLD.Get_rank();
+    proc_num = MPI::COMM_WORLD.Get_size();
 
     // Initializing of pivot_array
     for (int i = 0; i<column_size; i++)
@@ -28,7 +32,7 @@ bool block::add_column(int id, int* data)
 }
 
 
-// find the max of column k and swap the pivot array values
+// find the max of column k
 // then return the id of the row that have the max elem.
 int block::find_pivot(int k)
 {
@@ -44,10 +48,16 @@ int block::find_pivot(int k)
         }
     }
 
-    //swap k-th element of pivot array with max_val_id-th
+    //update_pivot(k, max_val_id);
+    return max_val_id;
+}
+
+//swap k-th element of pivot array with max_val_id-th
+bool update_pivot(int k, int max_val_id)
+{
+
     int tmp = pivot_array[k];
     pivot_array[k] = pivot_array[max_val_id];
     pivot_array[max_val_id] = tmp;
-
-    return max_val_id;
+    return true;
 }
