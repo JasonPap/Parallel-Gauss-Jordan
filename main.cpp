@@ -32,7 +32,7 @@ int main(int argc, char *argv[])
     cout<<endl;
 
     // Compute the solution
-    for ( int k = 0; k <= array_dimention; k++ )    ///isws < kai oxi <=
+    for ( int k = 0; k < array_dimention; k++ )
     {
         int max_val_id;
         if ( k is in my columns )
@@ -48,6 +48,7 @@ int main(int argc, char *argv[])
 
 
     // Finalize, print solution
+
 
     MPI_Barrier(MPI_COMM_WORLD);
 }

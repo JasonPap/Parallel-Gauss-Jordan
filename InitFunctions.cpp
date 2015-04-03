@@ -9,14 +9,14 @@
 
 using namespace std;
 
-int** create2Darray(int dimention)
+float** create2Darray(int dimention)
 {
     srand(time(NULL));
     int i,j;
-    int** square_array = new int*[dimention];
+    float** square_array = new float*[dimention];
     for ( i = 0; i < dimention; i++)
     {
-        square_array[i] = new int[dimention];
+        square_array[i] = new float[dimention];
         for ( j = 0; j < dimention; j++)
             square_array[i][j] = rand();
     }
@@ -24,11 +24,11 @@ int** create2Darray(int dimention)
 }
 
 
-int* create1Darray(int dimention)
+float* create1Darray(int dimention)
 {
     srand(time(NULL));
     int i;
-    int* vect = new int[dimention];
+    float* vect = new float[dimention];
     for ( i = 0; i < dimention; i++)
     {
         vect[i] = rand();
@@ -52,8 +52,8 @@ block* initialize(int dimention, int partition_mode)
     block* proc_block = new block(dimention);    //arrays that will be used for the Gauss-Jordan Method
     if (proc_id == 0)   //if master process
     {
-        int** tmpArrayA = create2Darray(dimention);
-        int* B = create1Darray(dimention);
+        float** tmpArrayA = create2Darray(dimention);
+        float* B = create1Darray(dimention);
         proc_block->add_column(dimention, B);   //Master will always have the vector B
 
         // Async requests hadlers
@@ -68,7 +68,7 @@ block* initialize(int dimention, int partition_mode)
         {
             for ( int i = 0; i < dimention; i++)
             {
-                MPI_Isend(tmpArrayA[i], dimention, MPI_INT, i%proc_num,
+                MPI_Isend(tmpArrayA[i], dimention, MPI_FLOAT, i%proc_num,
                             i, MPI_COMM_WORLD, &(SendRequests[i]));
                 delete[] tmpArrayA[i];
             }
@@ -77,7 +77,7 @@ block* initialize(int dimention, int partition_mode)
         {
             for ( int i = 0; i < dimention; i++)
             {
-                MPI_Isend(tmpArrayA[i], dimention, MPI_INT, i/proc_num,
+                MPI_Isend(tmpArrayA[i], dimention, MPI_FLOAT, i/proc_num,
                             i, MPI_COMM_WORLD, &(SendRequests[i]));
                 delete[] tmpArrayA[i];
             }
@@ -94,9 +94,9 @@ block* initialize(int dimention, int partition_mode)
         {
             if ( i%proc_num == proc_id )
             {
-                int* data = new int[dimention];
+                float* data = new float[dimention];
                 MPI_Request request;
-                MPI_Irecv((void*)data, dimention, MPI_INT, 0, i, MPI_COMM_WORLD, &request);
+                MPI_Irecv((void*)data, dimention, MPI_FLOAT, 0, i, MPI_COMM_WORLD, &request);
                 ReceiveRequests[j++] = request;
                 proc_block->add_column(i, data);
             }
@@ -105,9 +105,9 @@ block* initialize(int dimention, int partition_mode)
         {
             if ( i/proc_num == proc_id )
             {
-                int* data = new int[dimention];
+                float* data = new float[dimention];
                 MPI_Request request;
-                MPI_Irecv((void*)data, dimention, MPI_INT, 0, i, MPI_COMM_WORLD, &request);
+                MPI_Irecv((void*)data, dimention, MPI_FLOAT, 0, i, MPI_COMM_WORLD, &request);
                 ReceiveRequests[j++] = request;
                 proc_block->add_column(i, data);
             }

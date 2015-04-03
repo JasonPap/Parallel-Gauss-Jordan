@@ -25,7 +25,7 @@ block::~block()
         free(it->second);   //delete column data
 }
 
-bool block::add_column(int id, int* data)
+bool block::add_column(int id, float* data)
 {
     column[id] = data;
     return true;
@@ -36,8 +36,8 @@ bool block::add_column(int id, int* data)
 // then return the id of the row that have the max elem.
 int block::find_pivot(int k)
 {
-    int* current_column = column[k];
-    int max_val = current_column[pivot_array[k]];
+    float* current_column = column[k];
+    float max_val = current_column[pivot_array[k]];
     int max_val_id = k;
     for ( int i = k + 1; k < column_size; k++ )
     {
@@ -53,11 +53,17 @@ int block::find_pivot(int k)
 }
 
 //swap k-th element of pivot array with max_val_id-th
-bool update_pivot(int k, int max_val_id)
+bool block::update_pivot(int k, int max_val_id)
 {
 
     int tmp = pivot_array[k];
     pivot_array[k] = pivot_array[max_val_id];
     pivot_array[max_val_id] = tmp;
     return true;
+}
+
+bool block::compute_column(int column_num, int k)
+{
+    float* proc_column = column[column_num];
+    float ajk = proc_column[pivot_array[k]/pivot_array[k]];
 }
