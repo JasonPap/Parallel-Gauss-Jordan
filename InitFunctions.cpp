@@ -48,11 +48,12 @@ block* initialize(int dimention, int partition_mode)
     MPI_Comm_rank(MPI_COMM_WORLD, &proc_id);
 
     MPI_Request* SendRequests; // will only be used by master
+    float** tmpArrayA;
 
-    block* proc_block = new block(dimention);    //arrays that will be used for the Gauss-Jordan Method
+    block* proc_block = new block(dimention, partition_mode);    //arrays that will be used for the Gauss-Jordan Method
     if (proc_id == 0)   //if master process
     {
-        float** tmpArrayA = create2Darray(dimention);
+        tmpArrayA = create2Darray(dimention);
         float* B = create1Darray(dimention);
         proc_block->add_column(dimention, B);   //Master will always have the vector B
 
@@ -70,7 +71,6 @@ block* initialize(int dimention, int partition_mode)
             {
                 MPI_Isend(tmpArrayA[i], dimention, MPI_FLOAT, i%proc_num,
                             i, MPI_COMM_WORLD, &(SendRequests[i]));
-                delete[] tmpArrayA[i];
             }
         }
         else if( partition_mode = distribution::GROUPED )
@@ -79,11 +79,9 @@ block* initialize(int dimention, int partition_mode)
             {
                 MPI_Isend(tmpArrayA[i], dimention, MPI_FLOAT, i/proc_num,
                             i, MPI_COMM_WORLD, &(SendRequests[i]));
-                delete[] tmpArrayA[i];
             }
         }
 
-        delete[] tmpArrayA;
     }
 
     MPI_Request* ReceiveRequests = new MPI_Request[dimention/proc_num];
@@ -138,6 +136,13 @@ block* initialize(int dimention, int partition_mode)
             MPI_Finalize();
             exit(EXIT_FAILURE);
         }
+
+        for ( int j = 0; j<dimention; j++ )
+        {
+            delete[] tmpArrayA[j];
+        }
+        delete[] tmpArrayA;
+
         delete[] statuses;
         delete[] SendRequests;
     }

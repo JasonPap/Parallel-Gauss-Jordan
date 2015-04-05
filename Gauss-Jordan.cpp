@@ -17,8 +17,8 @@ int compute_values(block* proc_block, int k)
             continue;
 
         proc_block->compute_column(it->first, k);
-        float* column = it->second;
-        float akj = column[1];
+        /*float* column = it->second;
+        float akj = column[1];*/
 
     }
     return 1;

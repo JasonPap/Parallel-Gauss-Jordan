@@ -4,6 +4,7 @@
 #include <mpi.h>
 #include "ColumnBlock.h"
 #include "InitFunctions.h"
+#include "constants.h"
 
 using namespace std;
 
@@ -25,29 +26,33 @@ int main(int argc, char *argv[])
 
     // test to see if the collumns were distributed corectly
     int myrank = MPI::COMM_WORLD.Get_rank();
+    int proc_num = MPI::COMM_WORLD.Get_size();
     sleep(myrank*2);
     cout << "I am: "<<myrank<<endl;
     for ( auto it = proc_block->column.begin(); it != proc_block->column.end(); ++it )
         std::cout << "\t" << it->first;
     cout<<endl;
 
-    // Compute the solution
+    /// Compute the solution
     for ( int k = 0; k < array_dimention; k++ )
     {
         int max_val_id;
-        if ( k is in my columns )
+        if ( proc_block->local_column(k) )
         {
-            max_val_id = find_pivot(proc_block, k);
+            max_val_id = proc_block->find_pivot(k);
         }
+        ///send/receive pivoted elem id
+        ///send/receive k column
+        proc_block->sync(max_val_id, k);
 
-        Ibroadcast(max_val_id); //one send the others receive
-        proc_block->update_pivot(k, max_val_id);
+        ///processing
+        prock_block->compute_values(k);
 
-        compute_values(proc_block, k);
+
     }
 
 
-    // Finalize, print solution
+    /// Finalize, print solution
 
 
     MPI_Barrier(MPI_COMM_WORLD);
