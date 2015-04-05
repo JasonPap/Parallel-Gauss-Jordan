@@ -26,7 +26,8 @@ block::block(int column_size, int partition_mode)
 block::~block()
 {
     for ( auto it = column.begin(); it != column.end(); ++it )
-        free(it->second);   //delete column data
+        delete[] it->second;   //delete column data
+    delete[] k_column;
 }
 
 bool block::add_column(int id, float* data)
@@ -66,20 +67,28 @@ bool block::update_pivot(int k, int max_val_id)
     return true;
 }
 
-bool block::compute_column(int column_num, int k)
+/*bool block::compute_column(int column_num, int k)
 {
     float* proc_column = column[column_num];
     float ajk = proc_column[pivot_array[k]/pivot_array[k]];
-}
+}*/
 
 bool block::compute_values(int k)
 {
-    for ( auto it = proc_block->column.begin(); it != proc_block->column.end(); ++it )
+    float akk = k_column[k];
+    for ( auto it = column.begin(); it != column.end(); ++it )
     {
-        if ( it->first < k+1 )
+        if ( it->first < k + 1 )
             continue;
 
-        float* current_clumn = it->second;
+        float* Aj = it->second;
+        float* Ak = k_column;
+        Aj[k] = Aj[k]/akk;
+        for ( int i = 0; i<column_size; i++)
+        {
+            if( i != k )
+                Aj[i] = Aj[i] - Ak[i]*Aj[k];
+        }
 
     }
 }
@@ -90,20 +99,24 @@ bool block::sync(int max_val_id, int k)
 
     if ( local_column(k) )
     { //must send max_val_id and colum k
-        MPI_Request req;
-        MPI_Ibcast((void*)(&max_val_id), 1, MPI_INT, rank_id, MPI_COMM_WORLD, &req);
+        //MPI_Request req;
+        MPI_Bcast((void*)(&max_val_id), 1, MPI_INT, rank_id, MPI_COMM_WORLD);
 
-        MPI_Ibcast((void*)column[k], column_size, MPI_FLOAT, rank_id, MPI_COMM_WORLD, &req);
+        MPI_Bcast((void*)column[k], column_size, MPI_FLOAT, rank_id, MPI_COMM_WORLD);
+        cout<<"I am "<<rank_id<<", finished async broadcast."<<endl;
     }
     else
     { //receive
         int root = get_root(k);
+        cout<<"I am "<<rank_id<<", waiting broadcast from "<<root<<endl;
         MPI_Bcast((void*)(&max_val_id_local), 1, MPI_INT, root, MPI_COMM_WORLD);
 
         MPI_Bcast((void*)k_column, column_size, MPI_FLOAT, root, MPI_COMM_WORLD);
+        cout<<"I am "<<rank_id<<", finished sync broadcast."<<endl;
     }
 
     update_pivot(k, max_val_id_local);
+    cout<<"I am "<<rank_id<<", pivoted."<<endl;
     return true;
 }
 

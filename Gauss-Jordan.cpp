@@ -16,7 +16,7 @@ int compute_values(block* proc_block, int k)
         if ( it->first < k + 1 )    //only process columns from k+1 and on.
             continue;
 
-        proc_block->compute_column(it->first, k);
+        //proc_block->compute_column(it->first, k);
         /*float* column = it->second;
         float akj = column[1];*/
 

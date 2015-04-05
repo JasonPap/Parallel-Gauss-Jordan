@@ -24,7 +24,6 @@ private:
     int rank_id;
     int proc_num;
     int partition_mode;
-
     float* k_column;
 };
 #endif // _COLUMN_BLOCK_H_
