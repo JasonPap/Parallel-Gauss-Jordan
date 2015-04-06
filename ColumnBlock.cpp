@@ -2,6 +2,7 @@
 #include <iostream>
 #include <cstdlib>
 #include <mpi.h>
+#include <string.h>
 #include "ColumnBlock.h"
 #include "constants.h"
 
@@ -75,20 +76,41 @@ bool block::update_pivot(int k, int max_val_id)
 
 bool block::compute_values(int k)
 {
-    float akk = k_column[k];
+    ///DEBUG
+        if ( rank_id == 0)
+        {   cout<<"k column id = "<<endl;
+            for (int i = 0; i< column_size; i++)
+            {
+                cout<<k_column[i]<<", ";
+            }cout<<endl;
+        }
+    ///END DEBUG
+
+    float akk = k_column[pivot_array[k]];
+    float* Ak = k_column;
     for ( auto it = column.begin(); it != column.end(); ++it )
     {
         if ( it->first < k + 1 )
             continue;
 
         float* Aj = it->second;
-        float* Ak = k_column;
-        Aj[k] = Aj[k]/akk;
+
+        Aj[pivot_array[k]] = Aj[pivot_array[k]]/akk;
         for ( int i = 0; i<column_size; i++)
         {
             if( i != k )
-                Aj[i] = Aj[i] - Ak[i]*Aj[k];
+                Aj[pivot_array[i]] = Aj[pivot_array[i]] - Ak[pivot_array[i]]*Aj[pivot_array[k]];
         }
+
+        ///DEBUG
+        if ( rank_id == 0)
+        {   cout<<"column id = "<<it->first<<endl;
+            for (int i = 0; i< column_size; i++)
+            {
+                cout<<(column[column_size])[i]<<", ";
+            }cout<<endl;
+        }
+        ///END DEBUG
 
     }
 }
@@ -103,20 +125,21 @@ bool block::sync(int max_val_id, int k)
         MPI_Bcast((void*)(&max_val_id), 1, MPI_INT, rank_id, MPI_COMM_WORLD);
 
         MPI_Bcast((void*)column[k], column_size, MPI_FLOAT, rank_id, MPI_COMM_WORLD);
-        cout<<"I am "<<rank_id<<", finished async broadcast."<<endl;
+        memcpy(k_column, column[k], column_size*sizeof(float));
+        //cout<<"I am "<<rank_id<<", finished async broadcast."<<endl;
     }
     else
     { //receive
         int root = get_root(k);
-        cout<<"I am "<<rank_id<<", waiting broadcast from "<<root<<endl;
+        //cout<<"I am "<<rank_id<<", waiting broadcast from "<<root<<endl;
         MPI_Bcast((void*)(&max_val_id_local), 1, MPI_INT, root, MPI_COMM_WORLD);
 
         MPI_Bcast((void*)k_column, column_size, MPI_FLOAT, root, MPI_COMM_WORLD);
-        cout<<"I am "<<rank_id<<", finished sync broadcast."<<endl;
+        //cout<<"I am "<<rank_id<<", finished sync broadcast."<<endl;
     }
 
     update_pivot(k, max_val_id_local);
-    cout<<"I am "<<rank_id<<", pivoted."<<endl;
+    //cout<<"I am "<<rank_id<<", pivoted."<<endl;
     return true;
 }
 
