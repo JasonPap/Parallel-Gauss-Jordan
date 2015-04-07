@@ -112,7 +112,6 @@ bool block::sync(int max_val_id, int k)
     }
 
     update_pivot(k, max_val_id_local);
-    //cout<<"I am "<<rank_id<<", pivoted."<<endl;
     return true;
 }
 
@@ -120,7 +119,7 @@ int block::get_root(int k)
 {
     if ( partition_mode == distribution::GROUPED )
     {
-        return k/proc_num;
+        return k/(column_size/proc_num);
     }
     else if( partition_mode == distribution::ROUNDROBIN )
     {

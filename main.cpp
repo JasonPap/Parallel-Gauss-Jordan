@@ -27,6 +27,8 @@ int main(int argc, char *argv[])
     int myrank = MPI::COMM_WORLD.Get_rank();
     int proc_num = MPI::COMM_WORLD.Get_size();
 
+    //start timer
+    double start_time = MPI_Wtime();
 
     /// Compute the solution
     for ( int k = 0; k < array_dimention; k++ )
@@ -47,7 +49,11 @@ int main(int argc, char *argv[])
 
     /// Finalize, print solution
     if ( myrank == 0 )
+    {
+        cout<<"time: "<<MPI_Wtime() - start_time<<"s"<<endl;
         proc_block->print_solution();
+    }
 
-    MPI_Barrier(MPI_COMM_WORLD);
+    MPI_Finalize();
+    return 0;
 }

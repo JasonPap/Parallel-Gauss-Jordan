@@ -7,6 +7,6 @@ enum distribution
     ROUNDROBIN = 0
 };
 
-bool column_is_local(int rank_id, int proc_num, int k,int mode);
+bool column_is_local(int rank_id, int proc_num, int k,int mode, int dimention);
 
 #endif //_CONSTANTS_H_
