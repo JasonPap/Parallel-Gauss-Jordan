@@ -23,20 +23,20 @@ float** create2Darray(int dimention)
 
     ///
     square_array[0][0] = 1;
-    square_array[0][1] = 2;
-    square_array[0][2] = 0;
-    square_array[0][3] = 1;
     square_array[1][0] = 2;
+    square_array[2][0] = 0;
+    square_array[3][0] = 1;
+    square_array[0][1] = 2;
     square_array[1][1] = 2;
-    square_array[1][2] = -3;
-    square_array[1][3] = 21;
-    square_array[2][0] = 4;
     square_array[2][1] = -3;
+    square_array[3][1] = 21;
+    square_array[0][2] = 4;
+    square_array[1][2] = -3;
     square_array[2][2] = 5;
-    square_array[2][3] = 1;
-    square_array[3][0] = 6;
-    square_array[3][1] = 14;
-    square_array[3][2] = -6;
+    square_array[3][2] = 1;
+    square_array[0][3] = 6;
+    square_array[1][3] = 14;
+    square_array[2][3] = -6;
     square_array[3][3] = -5;
     ///
 
@@ -65,8 +65,6 @@ float* create1Darray(int dimention)
 block* initialize(int dimention, int partition_mode)
 {
     int proc_num = initialize_MPI();
-
-    //Create datatypes (if needed)
 
     // Get the MPI process id
     int proc_id;
@@ -153,7 +151,6 @@ block* initialize(int dimention, int partition_mode)
     {
         //wait on send
         MPI_Status* statuses = new MPI_Status[dimention];
-        cout <<"WAIT FOR SEND REQUESTS: "<<proc_id<<endl;
         int wait_retval = MPI_Waitall(dimention, SendRequests, statuses);
         if ( wait_retval != MPI_SUCCESS )
         {

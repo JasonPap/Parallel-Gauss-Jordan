@@ -12,12 +12,14 @@ public:
     bool compute_values(int k);
     bool sync(int max_val_id, int k);
     bool local_column(int k);
+    void print_solution();
 
     std::unordered_map<int, float*> column;   // key: column index, value: pointer to column
 
 private:
     int get_root(int k);
     bool update_pivot(int k, int max_val_id);
+    void print_pivot();
 
     int* pivot_array;
     int column_size;

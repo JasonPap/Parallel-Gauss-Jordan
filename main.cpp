@@ -24,16 +24,9 @@ int main(int argc, char *argv[])
     // Initialize the group of columns each process will get
     block* proc_block = initialize(array_dimention, partition_mode);
 
-
-    // test to see if the collumns were distributed corectly
     int myrank = MPI::COMM_WORLD.Get_rank();
     int proc_num = MPI::COMM_WORLD.Get_size();
 
-    /*sleep(myrank*2);
-    cout << "I am: "<<myrank<<endl;
-    for ( auto it = proc_block->column.begin(); it != proc_block->column.end(); ++it )
-        cout << "\t" << it->first;
-    cout<<endl;*/
 
     /// Compute the solution
     for ( int k = 0; k < array_dimention; k++ )
@@ -42,48 +35,19 @@ int main(int argc, char *argv[])
         if ( proc_block->local_column(k) )
         {
             max_val_id = proc_block->find_pivot(k);
-            //cout<<"max_val_id = "<<max_val_id<<endl;
         }
-        ///send/receive pivoted elem id
-        ///send/receive k column
+        //send/receive pivoted elem id
+        //send/receive k column
         proc_block->sync(max_val_id, k);
 
-        ///DEBUG
-        MPI_Barrier(MPI_COMM_WORLD);
-        ///END DEBUG
-
-        ///processing
+        //processing
         proc_block->compute_values(k);
-
-        ///DEBUG
-        MPI_Barrier(MPI_COMM_WORLD);
-        ///END DEBUG
-
-        ///DEBUG
-        if ( myrank == 0 )
-        {
-            for (int i = 0; i< array_dimention; i++)
-            {
-                cout<<(proc_block->column[array_dimention])[i]<<endl;
-            }
-            cout<<"step: "<<k<<endl;
-
-        }
-        MPI_Barrier(MPI_COMM_WORLD);
-        ///END DEBUG
     }
 
 
     /// Finalize, print solution
     if ( myrank == 0 )
-        {
-            for (int i = 0; i< array_dimention; i++)
-            {
-                cout<<(proc_block->column[array_dimention])[i]<<endl;
-            }
-            cout<<"finished"<<endl;
-
-        }
+        proc_block->print_solution();
 
     MPI_Barrier(MPI_COMM_WORLD);
 }

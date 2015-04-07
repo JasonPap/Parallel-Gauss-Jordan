@@ -45,7 +45,8 @@ int block::find_pivot(int k)
     float* current_column = column[k];
     float max_val = current_column[pivot_array[k]];
     int max_val_id = k;
-    for ( int i = k + 1; k < column_size; k++ )
+    int i;
+    for ( i = k + 1; i < column_size; i++ )
     {
         if ( current_column[pivot_array[i]] > max_val )
         {
@@ -54,7 +55,6 @@ int block::find_pivot(int k)
         }
     }
 
-    //update_pivot(k, max_val_id);
     return max_val_id;
 }
 
@@ -68,24 +68,8 @@ bool block::update_pivot(int k, int max_val_id)
     return true;
 }
 
-/*bool block::compute_column(int column_num, int k)
-{
-    float* proc_column = column[column_num];
-    float ajk = proc_column[pivot_array[k]/pivot_array[k]];
-}*/
-
 bool block::compute_values(int k)
 {
-    ///DEBUG
-        if ( rank_id == 0)
-        {   cout<<"k column id = "<<endl;
-            for (int i = 0; i< column_size; i++)
-            {
-                cout<<k_column[i]<<", ";
-            }cout<<endl;
-        }
-    ///END DEBUG
-
     float akk = k_column[pivot_array[k]];
     float* Ak = k_column;
     for ( auto it = column.begin(); it != column.end(); ++it )
@@ -101,17 +85,6 @@ bool block::compute_values(int k)
             if( i != k )
                 Aj[pivot_array[i]] = Aj[pivot_array[i]] - Ak[pivot_array[i]]*Aj[pivot_array[k]];
         }
-
-        ///DEBUG
-        if ( rank_id == 0)
-        {   cout<<"column id = "<<it->first<<endl;
-            for (int i = 0; i< column_size; i++)
-            {
-                cout<<(column[column_size])[i]<<", ";
-            }cout<<endl;
-        }
-        ///END DEBUG
-
     }
 }
 
@@ -161,4 +134,23 @@ bool block::local_column(int k)
         return true;
     else
         return false;
+}
+
+void block::print_pivot()
+{
+    for (int i = 0; i<column_size; i++)
+        cout<<"piv["<<i<<"] = "<<pivot_array[i]<<endl;
+}
+
+void block::print_solution()
+{
+    if ( rank_id != 0 )
+        return;
+
+    cout<<"SOLUTION:"<<endl;
+    for ( int i = 0; i < column_size; i++ )
+    {
+        cout<<"x"<<pivot_array[i]<< " = "<<(column[column_size])[i]<<endl;
+    }
+    return;
 }
