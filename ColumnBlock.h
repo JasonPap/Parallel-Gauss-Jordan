@@ -1,6 +1,6 @@
 #ifndef _COLUMN_BLOCK_H_
 #define _COLUMN_BLOCK_H_
-#include <unordered_map>
+#include <map>
 
 class block
 {
@@ -14,7 +14,7 @@ public:
     bool local_column(int k);
     void print_solution();
 
-    std::unordered_map<int, float*> column;   // key: column index, value: pointer to column
+    std::map<int, float*> column;   // key: column index, value: pointer to column
 
 private:
     int get_root(int k);

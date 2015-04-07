@@ -1,10 +1,10 @@
 #ifndef _CONSTANTS_H_
 #define _CONSTANTS_H_
 
-enum distribution
+namespace distribution
 {
-    GROUPED = 1,
-    ROUNDROBIN = 0
+    const int GROUPED = 1;
+    const int ROUNDROBIN = 0;
 };
 
 bool column_is_local(int rank_id, int proc_num, int k,int mode, int dimention);

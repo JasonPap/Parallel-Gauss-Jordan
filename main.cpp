@@ -1,6 +1,6 @@
-//#include <mpi.h>
 #include <iostream>
 #include <unistd.h>
+#include <cstdlib>
 #include <mpi.h>
 #include "ColumnBlock.h"
 #include "InitFunctions.h"

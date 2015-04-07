@@ -1,6 +1,6 @@
 CC = mpic++
 FLAGS = -c
-LINK_FLAGS = -std=c++11
+LINK_FLAGS = #-std=c++11
 OBJS = main.o InitFunctions.o constants.o ColumnBlock.o
 EXECUTABLE_NAME = parallel-gauss-jordan
 

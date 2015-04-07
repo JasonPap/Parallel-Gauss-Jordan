@@ -1,4 +1,4 @@
-#include <unordered_map>
+#include <map>
 #include <iostream>
 #include <cstdlib>
 #include <mpi.h>
@@ -26,7 +26,7 @@ block::block(int column_size, int partition_mode)
 
 block::~block()
 {
-    for ( auto it = column.begin(); it != column.end(); ++it )
+    for ( map<int,float*>::iterator it = column.begin(); it != column.end(); ++it )
         delete[] it->second;   //delete column data
     delete[] k_column;
 }
@@ -72,7 +72,7 @@ bool block::compute_values(int k)
 {
     float akk = k_column[pivot_array[k]];
     float* Ak = k_column;
-    for ( auto it = column.begin(); it != column.end(); ++it )
+    for ( map<int,float*>::iterator it = column.begin(); it != column.end(); ++it )
     {
         if ( it->first < k + 1 )
             continue;
