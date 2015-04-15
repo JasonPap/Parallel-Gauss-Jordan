@@ -11,6 +11,7 @@ public:
     int find_pivot(int k);
     bool compute_values(int k);
     bool sync(int max_val_id, int k);
+    bool sync2(int max_val_id, int k);
     bool local_column(int k);
     void print_solution();
 
