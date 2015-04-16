@@ -33,8 +33,6 @@ int main(int argc, char *argv[])
     /// Compute the solution
     for ( int k = 0; k < array_dimention; k++ )
     {
-        /*if (myrank == 0)
-            cout<<"K = "<<k<<endl;*/
         MPI_Barrier(MPI_COMM_WORLD);
 
         int max_val_id;
@@ -44,15 +42,12 @@ int main(int argc, char *argv[])
         }
         //send/receive pivoted elem id
         //send/receive k column
-        proc_block->sync2(max_val_id, k);
+        proc_block->sync(max_val_id, k);
 
         MPI_Barrier(MPI_COMM_WORLD);
-        /*if (myrank == 0)
-            cout<<"--------------------------------------------"<<k<<endl;*/
 
         //processing
         proc_block->compute_values(k);
-
     }
 
 
@@ -60,7 +55,8 @@ int main(int argc, char *argv[])
     if ( myrank == 0 )
     {
         cout<<"time: "<<MPI_Wtime() - start_time<<"s"<<endl;
-        proc_block->print_solution();
+        //uncomment next line to print the solution to stdout
+        //proc_block->print_solution();
     }
 
     MPI_Barrier(MPI_COMM_WORLD);

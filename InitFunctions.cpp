@@ -29,7 +29,7 @@ float** create2Darray(int dimention)
     //cout<<"array generated"<<endl;
 
     ///
-    square_array[0][0] = 1;
+    /*square_array[0][0] = 1;
     square_array[1][0] = 2;
     square_array[2][0] = 0;
     square_array[3][0] = 1;
@@ -44,7 +44,7 @@ float** create2Darray(int dimention)
     square_array[0][3] = 6;
     square_array[1][3] = 14;
     square_array[2][3] = -6;
-    square_array[3][3] = -5;
+    square_array[3][3] = -5;*/
     ///
 
     return square_array;
@@ -60,10 +60,10 @@ float* create1Darray(int dimention)
         vect[i] = rand()%100;
     }
     ///
-    vect[0] = 0;
+    /*vect[0] = 0;
     vect[1] = -2;
     vect[2] = -7;
-    vect[3] = 61;
+    vect[3] = 61;*/
     ///
     return vect;
 }

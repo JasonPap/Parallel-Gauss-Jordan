@@ -95,21 +95,17 @@ bool block::sync(int max_val_id, int k)
 
     if ( local_column(k) )
     { //must send max_val_id and colum k
-        //MPI_Request req;
         MPI_Bcast((void*)(&max_val_id), 1, MPI_INT, rank_id, MPI_COMM_WORLD);
 
         MPI_Bcast((void*)column[k], column_size, MPI_FLOAT, rank_id, MPI_COMM_WORLD);
         memcpy(k_column, column[k], column_size*sizeof(float));
-        //cout<<"I am "<<rank_id<<", finished async broadcast."<<endl;
     }
     else
     { //receive
         int root = get_root(k);
-        //cout<<"I am "<<rank_id<<", waiting broadcast from "<<root<<endl;
         MPI_Bcast((void*)(&max_val_id_local), 1, MPI_INT, root, MPI_COMM_WORLD);
 
         MPI_Bcast((void*)k_column, column_size, MPI_FLOAT, root, MPI_COMM_WORLD);
-        //cout<<"I am "<<rank_id<<", finished sync broadcast."<<endl;
     }
 
     update_pivot(k, max_val_id_local);
@@ -125,7 +121,7 @@ bool block::sync2(int max_val_id, int k)
     if ( local_column(k) )
     { //must send max_val_id and colum k
         MPI_Request req;
-        //cout<<"max_val to send = "<<max_val_id<<endl;
+
         memcpy(tmpbuffer + 1, column[k], column_size*sizeof(float));
         memcpy(tmpbuffer, &max_val_id, sizeof(int));
 
@@ -139,7 +135,7 @@ bool block::sync2(int max_val_id, int k)
 
 
                 if( dest == j)
-                {   //cout<<"I am "<<rank_id<<", sending to "<<dest<<endl;
+                {
                     MPI_Isend((void*)(tmpbuffer), column_size + 1, MPI_FLOAT, dest,
                             rank_id, MPI_COMM_WORLD, &req);
                     break;
@@ -149,13 +145,10 @@ bool block::sync2(int max_val_id, int k)
         //always send to master because he has the b array
         if ( rank_id != 0 )
         {
-            //cout<<"I am "<<rank_id<<", sending to "<<0<<endl;
             MPI_Isend((void*)(tmpbuffer), column_size + 1, MPI_FLOAT, 0,
                             rank_id, MPI_COMM_WORLD, &req);
         }
-        //sleep(10);
         memcpy(k_column, column[k], column_size*sizeof(float));
-        //cout<<"I am "<<rank_id<<", finished async broadcast."<<endl;
     }
     else
     { //receive
@@ -172,16 +165,12 @@ bool block::sync2(int max_val_id, int k)
             int root = get_root(k);
             MPI_Request req;
             MPI_Status stat;
-            //cout<<"I am "<<rank_id<<", waiting broadcast from "<<root<<endl;
+
             MPI_Irecv((void*)tmpbuffer, column_size + 1, MPI_FLOAT, root,
                         root, MPI_COMM_WORLD, &req);
             MPI_Wait(&req, &stat);
-            //max_val_id_local = (int)tmpbuffer[0];
             memcpy(&max_val_id_local, tmpbuffer, sizeof(int));
-            //cout<<"max_val received = "<<max_val_id_local<<"   "<<tmpbuffer[0]<<endl;
             memcpy(k_column, tmpbuffer+1, column_size*sizeof(float));
-
-            //cout<<"I am "<<rank_id<<", finished sync broadcast."<<endl;
         }
     }
 
