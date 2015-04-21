@@ -33,8 +33,6 @@ int main(int argc, char *argv[])
     /// Compute the solution
     for ( int k = 0; k < array_dimention; k++ )
     {
-        MPI_Barrier(MPI_COMM_WORLD);
-
         int max_val_id;
         if ( proc_block->local_column(k) )
         {
@@ -43,8 +41,6 @@ int main(int argc, char *argv[])
         //send/receive pivoted elem id
         //send/receive k column
         proc_block->sync(max_val_id, k);
-
-        MPI_Barrier(MPI_COMM_WORLD);
 
         //processing
         proc_block->compute_values(k);
