@@ -1,5 +1,5 @@
 CC = mpic++
-FLAGS = -c
+FLAGS = -c -O3
 LINK_FLAGS = #-std=c++11
 OBJS = main.o InitFunctions.o constants.o ColumnBlock.o
 EXECUTABLE_NAME = parallel-gauss-jordan
@@ -26,4 +26,5 @@ ColumnBlock.o: ColumnBlock.cpp
 # Clean-up
 clean:
 	rm -f $(EXECUTABLE_NAME)
+	rm -f $(OBJS)
 
